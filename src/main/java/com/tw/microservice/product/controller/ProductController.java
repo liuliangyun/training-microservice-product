@@ -1,5 +1,6 @@
 package com.tw.microservice.product.controller;
 
+
 import com.tw.microservice.product.entity.Product;
 import com.tw.microservice.product.exception.ProductNotFoundException;
 import com.tw.microservice.product.service.ProductService;
@@ -23,46 +24,50 @@ import java.util.List;
 @RestController
 @RequestMapping("/products")
 public class ProductController {
-    private final ProductService productService;
 
     @Autowired
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
+    ProductService productService;
 
+    //获取商品列表
     @GetMapping
     public ResponseEntity<List<Product>> getAll() {
-        List<Product> allProduct = productService.getAll();
-        return ResponseEntity.ok(allProduct);
+        List<Product> products = productService.getAll();
+        return ResponseEntity.ok(products);
     }
 
-    @PostMapping
-    public ResponseEntity add(@RequestBody Product product) {
-        productService.add(product);
-        return ResponseEntity.created(URI.create("/products/" + product.getId())).build();
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity update(@PathVariable int id, @RequestBody Product product) {
-        productService.update(id, product);
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity remove(@PathVariable int id){
-        productService.remove(id);
-        return ResponseEntity.noContent().build();
-    }
-
+    //获取一条商品
     @GetMapping("/{id}")
-    public ResponseEntity get(@PathVariable int id){
+    public ResponseEntity<Product> get(@PathVariable Long id){
         Product product = productService.get(id);
         return ResponseEntity.ok(product);
     }
 
+    //创建一条商品
+    @PostMapping
+    public ResponseEntity<Product> add(@RequestBody Product product) {
+        Product productNew = productService.add(product);
+        String str = "/products" + String.valueOf(productNew.getId());
+        return ResponseEntity.created(URI.create(str)).build();
+    }
+
+    //修改一条商品
+    @PutMapping("/{id}")
+    public ResponseEntity<Product> update(@PathVariable Long id, @RequestBody Product product) {
+        productService.update(id, product);
+        return ResponseEntity.noContent().build();
+    }
+
+    //删除一条商品
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Product> remove(@PathVariable Long id){
+        productService.remove(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    private void productNotFoundHandler(ProductNotFoundException ex) {
+    private void productNotFoundHandle(ProductNotFoundException ex) {
 
     }
+
 }

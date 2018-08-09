@@ -46,6 +46,21 @@ public class ProductServiceTest {
     }
 
     @Test
+    public void should_get_product_when_call_get(){
+        //given
+        long id = 1L;
+        Product product = new Product();
+        product.setId(id);
+        product.setName("test");
+        given(productRepository.findById(id)).willReturn(java.util.Optional.ofNullable(product));
+        //when
+        Product selectedProduct = productService.get(id);
+        //then
+        assertThat(selectedProduct.getId()).isEqualTo(id);
+        assertThat(selectedProduct.getName()).isEqualTo("test");
+    }
+
+    @Test
     public void should_correctly_add_product_when_call_add() {
         //given
         Product product = new Product();
@@ -55,50 +70,40 @@ public class ProductServiceTest {
         Product addedProduct = productService.add(product);
         //then
         assertThat(addedProduct).isEqualTo(product);
-
     }
 
     @Test
     public void should_correctly_update_product_when_call_update() {
         //given
+        long id = 1L;
         Product productOld = new Product();
         productOld.setName("test1");
-        productOld.setId(1);
+        productOld.setId(id);
         Product productNew = new Product();
         productNew.setName("test2");
-        productNew.setId(6);
-        int id = 1;
+        productNew.setId(id);
+
         given(productRepository.findById(id)).willReturn(java.util.Optional.of(productOld));
         given(productRepository.save(productNew)).willReturn(productNew);
         //when
-        productOld = productService.update(id, productNew);
+        Product updatedProduct = productService.update(id, productNew);
         //then
-        assertThat(productOld.getName()).isEqualTo("test2");
-        assertThat(productOld.getId()).isEqualTo(1);
+        assertThat(updatedProduct.getId()).isEqualTo(1L);
+        assertThat(updatedProduct.getName()).isEqualTo("test2");
     }
 
     @Test
     public void should_delete_product_when_given_product_id(){
         //given
-        int id = 1;
+        long id = 1L;
+        Product product = new Product();
+        product.setName("test1");
+        product.setId(id);
+        given(productRepository.findById(id)).willReturn(java.util.Optional.ofNullable(product));
         //when
         productService.remove(id);
         //then
         verify(productRepository,times(1)).deleteById(id);
     }
 
-    @Test
-    public void should_get_product_when_given_product_id(){
-        //given
-        int id = 1;
-        Product product = new Product();
-        product.setId(id);
-        product.setName("test");
-        given(productRepository.findById(id)).willReturn(java.util.Optional.ofNullable(product));
-        //when
-        Product selectedProduct = productService.get(id);
-        //then
-        assertThat(selectedProduct.getId()).isEqualTo(1);
-        assertThat(selectedProduct.getName()).isEqualTo("test");
-    }
 }

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -16,7 +15,6 @@ public class ProductService {
 
     @Autowired
     public ProductService(ProductRepository productRepository) {
-
         this.productRepository = productRepository;
     }
 
@@ -24,23 +22,27 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+    public Product get(Long id) throws ProductNotFoundException {
+        return productRepository.findById(id).orElseThrow(ProductNotFoundException::new);
+    }
+
     public Product add(Product product) {
         return productRepository.save(product);
     }
 
-    public Product update(int id, Product product) throws ProductNotFoundException {
-        productRepository.findById(id).orElseThrow(ProductNotFoundException::new);
-        product.setId(id);
-        return productRepository.save(product);
+    public Product update(Long id, Product product) throws ProductNotFoundException {
+        Product selectedProduct = productRepository.findById(id).orElseThrow(ProductNotFoundException::new);
+        selectedProduct.setName(product.getName());
+        selectedProduct.setPrice(product.getPrice());
+        selectedProduct.setUnit(product.getUnit());
+        selectedProduct.setUnit(product.getImag());
+        productRepository.save(selectedProduct);
+        return selectedProduct;
     }
 
-
-    public void remove(int id) {
+    public void remove(Long id) throws ProductNotFoundException {
+        productRepository.findById(id).orElseThrow(ProductNotFoundException::new);
         productRepository.deleteById(id);
     }
 
-    public Product get(int id) {
-        return productRepository.findById(id).orElseThrow(ProductNotFoundException::new);
-
-    }
 }
